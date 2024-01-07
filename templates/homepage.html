@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        header {
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        section {
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 0 10px;
+            border-radius: 5px;
+        }
+
+        h2 {
+            color: #3498db;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        input,
+        select {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1 style="color: rgb(251, 255, 0);font-size: 4vw;">شفیع سٹیل ٹریڑرز </h1>
+        <h2 style="color: rgb(255, 251, 0);">
+            <div>منشن نمبر 3 بمقابلہ میونسپل ڈسپنسری سنی بنک مری</div>
+            <div>0317-8102487 محمد حسن</div>051-3756649 :فون
+        </h2>
+    </header>
+
+    <div class="container">
+        <section>
+            <h2>Create Invoice</h2>
+            <form action="/create-user/" method="post">
+                {% csrf_token %}
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+                <label for="phone">Phone Number:</label>
+                <input type="text" id="phone" name="phone" required>
+                <button type="submit">Generate</button>
+            </form>
+        </section>
+
+        <section>
+            <h2>Search Records</h2>
+            <form action="" method="post">
+                {% csrf_token %}
+                <label for="search_type">Search By:</label>
+                <select id="search_type" name="search_type" required>
+                    <option value="product_name">Product Name</option>
+                    <option value="phone_number">Phone Number</option>
+                    <option value="date">Date</option>
+                </select>
+                <label for="search_value">Search Value:</label>
+                <input type="text" id="search_value" name="search_value" required>
+                <button type="submit">Search</button>
+            </form>
+        </section>
+
+        <section>
+            <h2>Review Invoice</h2>
+            <form action="" method="post">
+                {% csrf_token %}
+                <label for="invoice_number">Invoice Number:</label>
+                <input type="text" id="invoice_number" name="invoice_number" required>
+                <button type="submit">Review Invoice</button>
+            </form>
+        </section>
+    </div>
+</body>
+</html>

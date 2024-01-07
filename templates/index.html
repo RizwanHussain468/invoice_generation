@@ -1,0 +1,161 @@
+{% load static %}
+{% load tz %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <title>HTML to PDF for Printing</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+        integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dom-to-pdf@0.3.4/dist/dom-to-pdf.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pathdata@X.Y.Z/dist/SVGPathData.module.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400&display=swap" rel="stylesheet">
+    <title>Invoice</title>
+</head>
+
+<body style="background-color: white;">
+    <div id="resultContainer">
+    <form method="post" action="{% url 'save_data'  %}">
+        {% csrf_token %}
+    <div class="invoice-container" id="pdfContent">
+        <div class="invoice-header">
+            <h2 style="color: red;">
+                <div>منشن نمبر 3 بمقابلہ میونسپل ڈسپنسری سنی بنک مری</div>
+                <div>0317-8102487 محمد حسن</div>051-3756649 :فون
+            </h2>
+            <h1 style="color: white;">شفیع سٹیل ٹریڑرز </h1>
+            <h1 style="color: red;font-size: 4vw;">شفیع سٹیل ٹریڑرز </h1>
+        </div>
+        <h1 style="color: red; ">
+            <center>اسٹیمیٹڈ بل</center>
+        </h1>
+        <p style="color: rgb(0, 132, 255);font-size: large;"> {{ current_date|date:"d/m/Y" }}  تاریخ </p>
+        {% if invoice_id %}
+            <p align="right" style="color: rgb(0, 132, 255);font-size: large;"><input type="text" name="invoice_id"
+                value="{{ invoice_id }}" readonly># نمبر</p>
+            <h2 align="right" style="color: rgb(0, 132, 255);font-size: large;"><input type="text" placeholder="Enter Name" name="name"
+                class="product left" style="font-size: large;" value="{{ user.name }}" readonly> نام خریدار </h2>
+            <h2 align="right" style="color: rgb(0, 132, 255);font-size: large;"><input type="text" placeholder="Enter Your phone number" name="phone"
+                class="product left" style="font-size: large;" value="{{ user.phone_number }}" readonly> فون نمبر </h2>
+        {% else %}
+            <p align="right" style="color: rgb(0, 132, 255);font-size: large;">### نمبر</p>
+            <h2 align="right" style="color: rgb(0, 132, 255);font-size: large;"><input type="text" placeholder="Enter Name" name="name"
+                class="product left" style="font-size: large;"> نام خریدار </h2>
+            <h2 align="right" style="color: rgb(0, 132, 255);font-size: large;"><input type="text" placeholder="Enter Your phone number" name="phone"
+                class="product left" style="font-size: large;"> فون نمبر </h2>
+        {% endif %}
+        <div class="invoice-body">
+            <table>
+                <thead>
+                    <th style="text-align: left;font-size: large;">ACTION</th>
+                    <th style="font-size: large;">روپے</th>
+                    <th style="font-size: large;">نرخ</th>
+                    <th style="padding-right:12px;font-size: large;">تفصیل</th>
+                    <th style="font-size: large;">تعداد</th>
+                </thead>
+                <tbody id="table-body">
+                    <tr id="single-row">
+                        <!-- <td style="text-align: right;font-size: large;"><span
+                                class="material-icons">delete_outline</span></td> -->
+                        <td><input type="number" placeholder="0" name="price" class="price" id="price" disabled
+                                style="font-size: large;"></td>
+                        <td><input type="number" placeholder="0" name="unit_price" class="unit_price" id="unit_price"
+                                onkeyup="getInput()" style="font-size: large;"></td>
+                        <td>
+                            <div class="input-group mb-3">
+                                <select class="custom-select" name="product" id="product" style="font-size: large; direction: ltr;">
+                                    <option selected>-----------------</option>
+                                    {% for product in products %}
+                                    <option value="{{ product.id }}">{{ product.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="number" placeholder="0" name="quantity" class="quantity" id="quantity" onkeyup="getInput()"
+                                style="font-size: large;">
+                            <select class="custom-select" name="unit" id="unit" style="font-size: large;">
+                                <option value="text">---</option>
+                                <option value="kg">kg</option>
+                                <option value="ft">ft</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr style="padding-left: 20px">
+                        <td class="dashed ">
+                            <div class="float">
+                                <a href="#" class="float" id="add-row">
+                                    <span class="material-icons plus">add</span>
+                                </a>
+                            </div>
+                        </td>
+                        <td class="dashed"></td>
+                        <td class="dashed"></td>
+                        <td class="dashed"></td>
+                        <td class="dashed"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="color: rgb(0, 132, 255);"><input type="number" placeholder="0" name="loading_amount" class="loading_amount" id="loading_amount"
+                    onkeyup="getInput()"> LOADING </div>
+            <div style="color: rgb(0, 132, 255);"><input type="number" placeholder="0" name="debit_amount" class="debit_amount" id="debit_amount"
+                    onkeyup="getInput()"> DEBIT </div>
+            <div id="sum"><input type="text" placeholder="0.00" name="total_amount" class="total_amount" id="total_amount" value="{{ previous_debit_amount }}" readonly></div>
+          
+            <h2 style="color: rgb(78, 76, 76);">----------------- دستخط</h2>
+        </div>
+
+    </div>
+    {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+        <input type="submit" value="Save Data">
+
+        </form>
+    </div>
+    <button id="downloadPDF">Download PDF</button>
+    <script src="{% static 'app.js' %}" async defer></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Set the initial value of total_amount input field
+            var previousDebitAmount = parseFloat("{{ previous_debit_amount }}") || 0;
+            document.getElementById('total_amount').value = previousDebitAmount;
+    
+            // Add event listeners to update total_amount dynamically
+            document.getElementById('unit_price').addEventListener('keyup', updateTotalAmount);
+            document.getElementById('quantity').addEventListener('keyup', updateTotalAmount);
+            document.getElementById('loading_amount').addEventListener('keyup', updateTotalAmount);
+            document.getElementById('debit_amount').addEventListener('keyup', updateTotalAmount);
+    
+            function updateTotalAmount() {
+                // Calculate total amount based on selected product prices and user input
+                var unitPrice = parseFloat(document.getElementById('unit_price').value) || 0;
+                var quantity = parseFloat(document.getElementById('quantity').value) || 0;
+                var loadingAmount = parseFloat(document.getElementById('loading_amount').value) || 0;
+                var debitAmount = parseFloat(document.getElementById('debit_amount').value) || 0;
+    
+                var totalAmount = unitPrice * quantity + loadingAmount - debitAmount + previousDebitAmount;
+    
+                // Update the total_amount input field
+                document.getElementById('total_amount').value = totalAmount.toFixed(2);
+            }
+        });
+    </script>
+    <script>
+       
+    </script>
+</body>
+
+</html>
