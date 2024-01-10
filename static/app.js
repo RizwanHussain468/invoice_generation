@@ -101,18 +101,21 @@ function cloneRow() {
     // Clone the original row
     var newRow = originalRow.cloneNode(true);
 
+
     // Generate unique IDs for the new elements
     var newId = 'row-' + new Date().getTime();
     newRow.id = newId;
     newRow.querySelector('.unit_price').id = 'unit_price-' + newId;
     newRow.querySelector('.quantity').id = 'quantity-' + newId;
-    newRow.querySelector('#product').id = 'product-' + newId;
+    // newRow.querySelector('#product').id = 'product-' + newId;
 
     // Reset the values in the cloned row (optional)
     newRow.querySelector('.unit_price').value = '';
     newRow.querySelector('.quantity').value = '';
-    newRow.querySelector('#product').selectedIndex = 0;
+    // newRow.querySelector('#product')?.selectedIndex = 0;
 
+      // Add a class to the new row for easy selection
+      newRow.classList.add('row-item');
     // Append the new row to the table
     tableBody.appendChild(newRow);
 
@@ -123,13 +126,14 @@ function cloneRow() {
 
 //GET INPUTS, MULTIPLY AND GET THE ITEM PRICE
 getInput =()=> {
-    var rows = document.querySelectorAll("tr.single-row");
+    var rows = document.querySelectorAll("tr.row-item");
+    console.log(rows[0].querySelector("quantity"))
     rows.forEach((currentRow) => {
-        var quantity = currentRow.querySelector("#quantity").value;
-        var unit_price = currentRow.querySelector("#unit_price").value;
+        var quantity = currentRow.querySelector(".quantity").value;
+        var unit_price = currentRow.querySelector(".unit_price").value;
         unit_price
         price = quantity * unit_price;
-        currentRow.querySelector("#price").value = price;
+        currentRow.querySelector(".price").value = price;
         overallSum();
         
     })
@@ -158,15 +162,15 @@ overallSum =()=> {
     document.getElementById("total_amount").value = total_amount;
 }
 
-//Delete row from the table
-// tBody.addEventListener("click", (e)=>{
-//     let el = e.target;
-//     const deleteROW = e.target.attributes.action?.value;
-//     if(deleteROW == "delete") {
-//         delRow(el);
-//         overallSum();
-//     }
-// })
+// Delete row from the table
+tBody.addEventListener("click", (e)=>{
+    let el = e.target;
+    const deleteROW = e.target.attributes.action?.value;
+    if(deleteROW == "delete") {
+        delRow(el);
+        overallSum();
+    }
+})
 
 function addScript(url) {
     var script = document.createElement('script');
@@ -178,7 +182,7 @@ addScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bu
 
 
 
-// //Target row and remove from DOM;
-// delRow =(el)=> {
-//     el.parentNode.parentNode.parentNode.removeChild(el.parentNode.parentNode);
-// }
+//Target row and remove from DOM;
+delRow =(el)=> {
+    el.parentNode.parentNode.parentNode.removeChild(el.parentNode.parentNode);
+}

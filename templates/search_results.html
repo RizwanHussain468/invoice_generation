@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f5f5f5;
+        }
+
+        input {
+            width: 80px;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .no-data {
+            margin: 20px;
+            text-align: center;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h2>{{ title }}</h2>
+    {% if invoices %}
+    <form action="{% url 'update_invoice' %}" method="post">
+        {% csrf_token %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Date Created</th>
+                    <th>User</th>
+                    <th>Phone Number</th>
+                    <th>Invoice number</th>
+                    <th>Total Amount</th>
+                    <th>Loading Amount</th>
+                    <th>Debit Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for invoice in invoices %}
+                    <tr>
+                        <td>{{ invoice.created|date }}</td>
+                        <td>{{ invoice.user.name }}</td>
+                        <td>{{ invoice.user.phone_number }}</td>
+                        <td>{{ invoice.invoice_number }}</td>
+                        <td>{{ invoice.total_amount }}</td>
+                        <td>{{ invoice.loading_amount }}</td>
+                        <td>
+                            <input type="number" name="debit_amounts[]" value="{{ invoice.debit_amount }}">
+                            <input type="hidden" name="invoice_ids[]" value="{{ invoice.id }}">
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button type="submit">Update</button>
+    </form>
+    {% else %}
+        <div class="no-data">No data found.</div>
+    {% endif %}
+    <br>
+    <br>
+    <a href="{% url 'homepage' %}"><button>Go to Homepage</button></a>
+</body>
+</html>

@@ -13,14 +13,14 @@
             background-color: #f4f4f4;
             color: #333;
         }
-
+    
         header {
             background-color: #3498db;
             color: #fff;
             padding: 10px;
             text-align: center;
         }
-
+    
         .container {
             max-width: 1200px;
             margin: 20px auto;
@@ -28,7 +28,7 @@
             justify-content: space-between;
             align-items: flex-start;
         }
-
+    
         section {
             background-color: #fff;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -36,32 +36,35 @@
             margin: 0 10px;
             border-radius: 5px;
         }
-
+    
         h2 {
             color: #3498db;
             border-bottom: 2px solid #3498db;
             padding-bottom: 5px;
             margin-bottom: 15px;
         }
-
+    
         form {
             display: flex;
             flex-direction: column;
         }
-
+    
         label {
             margin-bottom: 8px;
             color: #555;
         }
-
+    
         input,
-        select {
+        select,
+        textarea {
             padding: 10px;
             margin-bottom: 15px;
             border: 1px solid #ccc;
             border-radius: 3px;
+            box-sizing: border-box; /* Include padding and border in element's total width and height */
+            width: 100%; /* Make the textarea fully expanded */
         }
-
+    
         button {
             padding: 10px;
             background-color: #3498db;
@@ -70,9 +73,22 @@
             border-radius: 3px;
             cursor: pointer;
         }
-
+    
         button:hover {
             background-color: #2980b9;
+        }
+        .messages {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 3px;
+            font-weight: bold; /* Make the messages bold */
+        }
+
+        .messages p {
+            margin: 50;
+            text-align: center;
         }
     </style>
 </head>
@@ -84,7 +100,13 @@
             <div>0317-8102487 محمد حسن</div>051-3756649 :فون
         </h2>
     </header>
-
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
     <div class="container">
         <section>
             <h2>Create Invoice</h2>
@@ -100,29 +122,44 @@
 
         <section>
             <h2>Search Records</h2>
-            <form action="" method="post">
+            <form action="/search/" method="post">
                 {% csrf_token %}
                 <label for="search_type">Search By:</label>
                 <select id="search_type" name="search_type" required>
+                    <option value="user_name">User Name</option>
                     <option value="product_name">Product Name</option>
                     <option value="phone_number">Phone Number</option>
                     <option value="date">Date</option>
                 </select>
                 <label for="search_value">Search Value:</label>
+                <div id="date-format-hint" style="display: none; font-size: 12px; color: #0a0a0a; margin-top: 5px;">Enter date in the format "YYYY-MM-DD"</div>
                 <input type="text" id="search_value" name="search_value" required>
                 <button type="submit">Search</button>
             </form>
         </section>
 
         <section>
-            <h2>Review Invoice</h2>
-            <form action="" method="post">
+            <h2>Add Product</h2>
+
+            <form action="{% url 'add_product' %}" method="post">
                 {% csrf_token %}
-                <label for="invoice_number">Invoice Number:</label>
-                <input type="text" id="invoice_number" name="invoice_number" required>
-                <button type="submit">Review Invoice</button>
+                <label for="product_name">Product Name:</label>
+                <input type="text" id="product_name" name="product_name" required>
+                <label for="product_description">Product Description:</label>
+                <textarea id="product_description" name="product_description" ></textarea>
+                <button type="submit">ADD</button>
             </form>
         </section>
     </div>
 </body>
+<script>
+    document.getElementById('search_type').addEventListener('change', function () {
+        var dateHint = document.getElementById('date-format-hint');
+        if (this.value === 'date') {
+            dateHint.style.display = 'block';
+        } else {
+            dateHint.style.display = 'none';
+        }
+    });
+</script>
 </html>

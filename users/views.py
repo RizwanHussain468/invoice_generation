@@ -1,12 +1,11 @@
 import pytz
 
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse
 from django.contrib import messages
 from django.shortcuts import render, get_object_or_404, redirect
 
 from .models import User, Invoice, InvoiceItem, Product
 from django.utils import timezone
-from django.core.serializers import serialize
 
 
 
@@ -23,15 +22,11 @@ def create_user(request):
 
         if existing_user:
             existing_invoice = Invoice.objects.filter(invoice_number__isnull=False).last()
-            print(existing_invoice)
-
             if not existing_invoice:
                 new_invoice = Invoice.objects.create(user=existing_user)
-                print("new ", new_invoice)
                 invoice_id = new_invoice.id
             else:
                 invoice_id = existing_invoice.invoice_number + 1
-            print("idd ", invoice_id)
             return redirect('invoice', invoice_id, existing_user.id)
 
         new_user = User.objects.create(name=name, phone_number=phone_number)
@@ -71,8 +66,6 @@ def generate_invoice(request, invoice_id, user_id):
 
 
 def save_data(request):
-    print("Received data:", request.POST)
-
     name = request.POST.get('name')
     phone = request.POST.get('phone')
     invoice_id = request.POST.get('invoice_id')
@@ -83,17 +76,6 @@ def save_data(request):
     quantity_list = request.POST.getlist('quantity')
     product_list = request.POST.getlist('product')
     unit_list = request.POST.getlist('unit')
-
-    print("Name:", name)
-    print("Phone:", phone)
-    print("Invoice:", invoice_id)
-    print("Loading Amount:", loading_amount)
-    print("Debit Amount:", debit_amount)
-
-    print("Unit Prices:", unit_price_list)
-    print("Quantities:", quantity_list)
-    print("Products:", product_list)
-    print("Units:", unit_list)
 
     if loading_amount == '':
         loading_amount = 0
@@ -133,14 +115,49 @@ def save_data(request):
     user_invoice.debit_amount = float(debit_amount)
     user_invoice.save()
 
-    messages.success(request, 'Data saved successfully')
-    return redirect('invoice', invoice_id=user_invoice.id, user_id=user.id)
+    return HttpResponse("Data saved successfully")
 
 
-def get_products(request):
-    products = Product.objects.all()
-    # Serialize the queryset to JSON
-    serialized_products = serialize('json', products)
-    
-    return JsonResponse({'products': serialized_products})
+def search_records(request):
+    if request.method == 'POST':
+        search_type = request.POST.get('search_type')
+        search_value = request.POST.get('search_value')
+
+        if search_type == 'user_name':
+            user = User.objects.filter(name=search_value).first()
+            invoices = Invoice.objects.filter(user=user)
+        elif search_type == 'product_name':
+            invoices = Invoice.objects.filter(items__product__name__icontains=search_value)
+        elif search_type == 'phone_number':
+            invoices = Invoice.objects.filter(user__phone_number__icontains=search_value)
+        elif search_type == 'date':
+            invoices = Invoice.objects.filter(created__date=search_value)   
+            
+        return render(request, 'search_results.html', {'title': f'Search by {search_type.capitalize()}', 'invoices': invoices})
+    return render(request, 'homepage.html')
  
+
+def update_invoice(request):
+    if request.method == 'POST':
+        debit_amounts = request.POST.getlist('debit_amounts[]')
+        invoice_ids = request.POST.getlist('invoice_ids[]')
+
+        for invoice_id, updated_amount in zip(invoice_ids, debit_amounts):
+            invoice = Invoice.objects.get(id=invoice_id)
+            invoice.debit_amount = updated_amount
+            invoice.save()
+        messages.success(request, 'Invoices updated successfully!')
+        return redirect('search_records')
+    
+    return render(request, 'search_records.html')
+
+
+def add_product(request):
+    if request.method == 'POST':
+        product_name = request.POST.get('product_name')
+        product_description = request.POST.get('product_description')
+
+        Product.objects.create(name=product_name, description=product_description)
+
+        messages.success(request, 'Product added successfully.')
+        return redirect('homepage')

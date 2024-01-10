@@ -7,5 +7,8 @@ urlpatterns = [
     path("create-user/", views.create_user, name='create_user'),
     path('invoice/<int:invoice_id>/<int:user_id>/', views.generate_invoice, name='invoice'),
     path('save-data/', views.save_data, name='save_data'),
-    path('get-products/', views.get_products, name='get_products'),
+    path('search/', views.search_records, name='search_records'),
+    path('update/', views.update_invoice, name='update_invoice'),
+    path('add_product/', views.add_product, name='add_product'),
+
 ]

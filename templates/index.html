@@ -62,8 +62,8 @@
                 </thead>
                 <tbody id="table-body">
                     <tr id="single-row">
-                        <!-- <td style="text-align: right;font-size: large;"><span
-                                class="material-icons">delete_outline</span></td> -->
+                        <td style="text-align: right;font-size: large;"><span
+                                class="material-icons">delete_outline</span></td>
                         <td><input type="number" placeholder="0" name="price" class="price" id="price" disabled
                                 style="font-size: large;"></td>
                         <td><input type="number" placeholder="0" name="unit_price" class="unit_price" id="unit_price"
@@ -113,18 +113,12 @@
         </div>
 
     </div>
-    {% if messages %}
-    <ul class="messages">
-      {% for message in messages %}
-        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
         <input type="submit" value="Save Data">
 
         </form>
     </div>
     <button id="downloadPDF">Download PDF</button>
+    <a href="{% url 'homepage' %}"><button>Go to Homepage</button></a>
     <script src="{% static 'app.js' %}" async defer></script>
     
     <script>
