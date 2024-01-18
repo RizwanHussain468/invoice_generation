@@ -45,30 +45,6 @@ const tBody = document.getElementById("table-body");
 //     addNewR  ow();
 // });
 
-document.addEventListener('DOMContentLoaded', function () {
-    // Set the initial value of total_amount input field
-    var previousDebitAmount = parseFloat("{{ previous_debit_amount }}") || 0;
-    document.getElementById('total_amount').value = previousDebitAmount;
-
-    // Add event listeners to update total_amount dynamically
-    document.getElementById('unit_price').addEventListener('keyup', updateTotalAmount);
-    document.getElementById('quantity').addEventListener('keyup', updateTotalAmount);
-    document.getElementById('loading_amount').addEventListener('keyup', updateTotalAmount);
-    document.getElementById('debit_amount').addEventListener('keyup', updateTotalAmount);
-
-    function updateTotalAmount() {
-        // Calculate total amount based on selected product prices and user input
-        var unitPrice = parseFloat(document.getElementById('unit_price').value) || 0;
-        var quantity = parseFloat(document.getElementById('quantity').value) || 0;
-        var loadingAmount = parseFloat(document.getElementById('loading_amount').value) || 0;
-        var debitAmount = parseFloat(document.getElementById('debit_amount').value) || 0;
-
-        var totalAmount = unitPrice * quantity + loadingAmount - debitAmount + previousDebitAmount;
-
-        // Update the total_amount input field
-        document.getElementById('total_amount').value = totalAmount.toFixed(2);
-    }
-});
 
 document.getElementById('downloadPDF').addEventListener('click', function () {
     const element = document.getElementById('pdfContent');

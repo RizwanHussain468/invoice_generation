@@ -1,4 +1,5 @@
 import pytz
+from decimal import Decimal
 
 from django.http import HttpResponse
 from django.contrib import messages
@@ -124,8 +125,8 @@ def search_records(request):
         search_value = request.POST.get('search_value')
 
         if search_type == 'user_name':
-            user = User.objects.filter(name=search_value).first()
-            invoices = Invoice.objects.filter(user=user)
+            user = User.objects.filter(name__iexact=search_value)
+            invoices = Invoice.objects.filter(user__in=user)
         elif search_type == 'product_name':
             invoices = Invoice.objects.filter(items__product__name__icontains=search_value)
         elif search_type == 'phone_number':
@@ -142,14 +143,16 @@ def update_invoice(request):
         debit_amounts = request.POST.getlist('debit_amounts[]')
         invoice_ids = request.POST.getlist('invoice_ids[]')
 
-        for invoice_id, updated_amount in zip(invoice_ids, debit_amounts):
-            invoice = Invoice.objects.get(id=invoice_id)
-            invoice.debit_amount = updated_amount
-            invoice.save()
-        messages.success(request, 'Invoices updated successfully!')
+        if debit_amounts:
+            for invoice_id, updated_amount in zip(invoice_ids, debit_amounts):
+                if updated_amount:
+                    invoice = Invoice.objects.get(id=invoice_id)
+                    invoice.debit_amount = Decimal(updated_amount)
+                    invoice.save()
+                    messages.success(request, 'Invoices updated successfully!')
         return redirect('search_records')
     
-    return render(request, 'search_records.html')
+    return render(request, 'search_results.html')
 
 
 def add_product(request):
