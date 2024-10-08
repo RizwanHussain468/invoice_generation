@@ -52,7 +52,7 @@ document.getElementById('downloadPDF').addEventListener('click', function () {
     // Options for PDF generation
     const options = {
         margin: 2,
-        filename: 'document.pdf',
+        filename: 'invoice_id.pdf',
         image: { type: 'jpeg', quality: 1.0 },
         html2canvas: {scale:3, logging: true, useCORS: true }, // Adjusted options for html2canvas
         jsPDF: { quantity: 'mm', format: 'a4', orientation: 'portrait' }
@@ -110,43 +110,63 @@ getInput =()=> {
         unit_price
         price = quantity * unit_price;
         currentRow.querySelector(".price").value = price;
-        overallSum();
-        
+       
     })
+    overallSum(); 
 };
 
-
-
-
 //Get the overall sum/Total
-overallSum =()=> {
+overallSum = () => {
     var arr = document.getElementsByName("price");
     var total_amount = 0;
-    for(var i = 0; i < arr.length; i++) {
-        if(arr[i].value) {
+
+    // Sum the prices
+    for (var i = 0; i < arr.length; i++) {
+        if (arr[i].value) {
             total_amount += +arr[i].value;
         }
-        document.getElementById("total_amount").value = total_amount;
     }
 
-    var loading_amount = parseFloat(document.getElementsByName("loading_amount")[0].value) || 0;
-    total_amount = total_amount + loading_amount;
+    // Display initial total before adding other amounts
     document.getElementById("total_amount").value = total_amount;
 
-    var debit_amount = parseFloat(document.getElementsByName("debit_amount")[0].value) || 0;
+    // Add loading amount (convert to number)
+    var loading_amount = +document.getElementsByName("loading_amount")[0].value || 0;
+    total_amount += loading_amount;
+
+    // Subtract debit amount (convert to number)
+    var debit_amount = +document.getElementsByName("debit_amount")[0].value || 0;
     total_amount -= debit_amount;
+
+    // Update the total_amount field
     document.getElementById("total_amount").value = total_amount;
 }
 
+
+
 // Delete row from the table
-tBody.addEventListener("click", (e)=>{
+tBody.addEventListener("click", (e) => {
     let el = e.target;
-    const deleteROW = e.target.attributes.action?.value;
-    if(deleteROW == "delete") {
-        delRow(el);
+
+    // Check if the clicked element is the delete button
+    if (el.tagName === "SPAN" && el.textContent === "delete_outline") {
+        // Traverse up to the closest row and remove it
+        let row = el.closest("tr");
+        row.remove();
+
+        // Recalculate the overall sum after deleting a row
         overallSum();
     }
-})
+});
+
+// Target row and remove from DOM (this is now handled directly in the listener)
+delRow = (el) => {
+    let row = el.closest("tr");
+    row.remove();
+}
+
+
+
 
 function addScript(url) {
     var script = document.createElement('script');
@@ -158,7 +178,3 @@ addScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bu
 
 
 
-//Target row and remove from DOM;
-delRow =(el)=> {
-    el.parentNode.parentNode.parentNode.removeChild(el.parentNode.parentNode);
-}

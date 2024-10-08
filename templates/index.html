@@ -21,6 +21,22 @@
 </head>
 
 <body style="background-color: white;">
+<button id="downloadPDF" style="
+  background-color: red;
+  color: white;
+  padding: 10px 30px;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-family: 'Arial', sans-serif;
+  font-size: 18px;
+  font-weight: bold;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
+">
+    Download PDF
+</button>
+
     <div id="resultContainer">
     <form method="post" action="{% url 'save_data'  %}">
         {% csrf_token %}
@@ -113,40 +129,74 @@
         </div>
 
     </div>
-        <input type="submit" value="Save Data">
+    <input type="submit" value="Save Data" id="saveDataInput" style="
+      background-color: red;
+      color: white;
+      padding: 10px 30px;
+      border: 2px solid white; /* White border */
+      border-radius: 50px;
+      cursor: pointer;
+      font-family: 'Arial', sans-serif;
+      font-size: 18px;
+      font-weight: bold;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease, border-color 0.3s ease; /* Transition for border color */
+    ">
+
 
         </form>
     </div>
-    <button id="downloadPDF">Download PDF</button>
-    <a href="{% url 'homepage' %}"><button>Go to Homepage</button></a>
+<a href="{% url 'homepage' %}" style="text-decoration: none;">
+    <button style="
+    background-color: red;
+    color: white;
+    padding: 10px 30px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-family: 'Arial', sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+  ">
+        Go to Homepage
+    </button>
+</a>
+
     <script src="{% static 'app.js' %}" async defer></script>
     
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Set the initial value of total_amount input field
-            var previousDebitAmount = parseFloat("{{ previous_debit_amount }}") || 0;
-            document.getElementById('total_amount').value = previousDebitAmount;
-    
-            // Add event listeners to update total_amount dynamically
-            document.getElementById('unit_price').addEventListener('keyup', updateTotalAmount);
-            document.getElementById('quantity').addEventListener('keyup', updateTotalAmount);
-            document.getElementById('loading_amount').addEventListener('keyup', updateTotalAmount);
-            document.getElementById('debit_amount').addEventListener('keyup', updateTotalAmount);
-    
-            function updateTotalAmount() {
-                // Calculate total amount based on selected product prices and user input
-                var unitPrice = parseFloat(document.getElementById('unit_price').value) || 0;
-                var quantity = parseFloat(document.getElementById('quantity').value) || 0;
-                var loadingAmount = parseFloat(document.getElementById('loading_amount').value) || 0;
-                var debitAmount = parseFloat(document.getElementById('debit_amount').value) || 0;
-    
-                var totalAmount = unitPrice * quantity + loadingAmount - debitAmount + previousDebitAmount;
-    
-                // Update the total_amount input field
-                document.getElementById('total_amount').value = totalAmount.toFixed(2);
-            }
-        });
-    </script>
+   document.addEventListener('DOMContentLoaded', function () {
+        // Set the initial value of total_amount input field
+        var previousDebitAmount = parseFloat(document.getElementById('previous_debit_amount').value) || 0;
+        document.getElementById('total_amount').value = previousDebitAmount;
+
+        // Add event listeners to update total_amount dynamically
+        document.getElementById('unit_price').addEventListener('keyup', updateTotalAmount);
+        document.getElementById('quantity').addEventListener('keyup', updateTotalAmount);
+        document.getElementById('loading_amount').addEventListener('keyup', updateTotalAmount);
+        document.getElementById('debit_amount').addEventListener('keyup', updateTotalAmount);
+
+        function updateTotalAmount() {
+            // Get values from the input fields
+            var unitPrice = parseFloat(document.getElementById('unit_price').value) || 0;
+            var quantity = parseFloat(document.getElementById('quantity').value) || 0;
+            var loadingAmount = parseFloat(document.getElementById('loading_amount').value) || 0;
+            var debitAmount = parseFloat(document.getElementById('debit_amount').value) || 0;
+            // previousDebitAmount is already set initially so no need to recalculate
+
+            // Calculate total amount correctly
+            var totalAmount = (unitPrice * quantity) + loadingAmount - debitAmount;
+
+            // Ensure the total amount is positive or zero (if needed)
+            if (totalAmount < 0) totalAmount = 0;
+
+            // Update the total_amount input field
+            document.getElementById('total_amount').value = totalAmount.toFixed(2);
+        }
+    });
+ </script>
 </body>
 
 </html>

@@ -9,8 +9,20 @@
 body {
     font-family: 'Roboto', Arial, sans-serif;
     background: white;
+    width: 100%;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+        /* Prevent horizontal scrolling if content overflows */
 }
-
+#resultContainer {
+    width: 100%;
+    /* Ensure the result container also spans full width */
+    max-width: 1200px;
+    /* Optional: Set a maximum width */
+    margin: 0 auto;
+    /* Center the result container */
+}
 .material-icons {
     cursor: pointer;
 }
@@ -176,15 +188,15 @@ input[type=number] {
 }
 
 /* Medium devices (landscape tablets, 768px and up) */
-@media only screen and (min-width: 768px) {
+@media only screen and (min-width: 9000px) {
     body {
         background: lemonchiffon;
     }
     .invoice-container {
         border: solid 1px gray;
-        width: 60%;
+        width: 100%;
         margin: 50px auto;
-        padding: 40px;
+        padding: 60px;
         padding-bottom: 100px;
         border-radius: 5px;
         background: white;
