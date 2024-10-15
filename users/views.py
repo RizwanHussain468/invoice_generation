@@ -14,6 +14,18 @@ def homepage_view(request):
     return render(request, 'homepage.html')
 
 
+def check_existing_invoice(user):
+    existing_invoice = Invoice.objects.filter().order_by('-created').first()
+    if not existing_invoice:
+        new_invoice = Invoice.objects.create(user=user)
+        invoice_id = new_invoice.id
+    elif existing_invoice and existing_invoice.invoice_number:
+        invoice_id = existing_invoice.id + 1
+    else:
+        invoice_id = existing_invoice.id
+    return invoice_id
+
+
 def create_user(request):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -22,18 +34,13 @@ def create_user(request):
         existing_user = User.objects.filter(phone_number=phone_number).first()
 
         if existing_user:
-            existing_invoice = Invoice.objects.filter(invoice_number__isnull=False).last()
-            if not existing_invoice:
-                new_invoice = Invoice.objects.create(user=existing_user)
-                invoice_id = new_invoice.id
-            else:
-                invoice_id = existing_invoice.invoice_number + 1
+            invoice_id = check_existing_invoice(existing_user)
             return redirect('invoice', invoice_id, existing_user.id)
-
+    
         new_user = User.objects.create(name=name, phone_number=phone_number)
-        invoice = Invoice.objects.create(user=new_user)
+        invoice_id = check_existing_invoice(new_user)
 
-        return redirect('invoice',  invoice.id, new_user.id)
+        return redirect('invoice',  invoice_id, new_user.id)
 
     return render(request, 'homepage.html')
 
@@ -73,10 +80,10 @@ def save_data(request):
     loading_amount = request.POST.get('loading_amount')
     debit_amount = request.POST.get('debit_amount')
 
-    unit_price_list = request.POST.getlist('unit_price')
-    quantity_list = request.POST.getlist('quantity')
-    product_list = request.POST.getlist('product')
-    unit_list = request.POST.getlist('unit')
+    unit_price_list = request.POST.getlist('unit_price')[1:]
+    quantity_list = request.POST.getlist('quantity')[1:]
+    product_list = request.POST.getlist('product')[1:]
+    unit_list = request.POST.getlist('unit')[1:]
 
     if loading_amount == '':
         loading_amount = 0
@@ -110,6 +117,7 @@ def save_data(request):
 
     total_amount += float(loading_amount)
     total_amount -= float(debit_amount)
+    user_invoice.user = user
     user_invoice.invoice_number = invoice_id
     user_invoice.total_amount = total_amount
     user_invoice.loading_amount = float(loading_amount)
@@ -144,12 +152,15 @@ def update_invoice(request):
         invoice_ids = request.POST.getlist('invoice_ids[]')
 
         if debit_amounts:
+            is_update = False
             for invoice_id, updated_amount in zip(invoice_ids, debit_amounts):
                 if updated_amount:
                     invoice = Invoice.objects.get(id=invoice_id)
                     invoice.debit_amount = Decimal(updated_amount)
                     invoice.save()
-                    messages.success(request, 'Invoices updated successfully!')
+                    is_update = True
+            if is_update:
+                messages.success(request, 'Invoices updated successfully!')
         return redirect('search_records')
     
     return render(request, 'search_results.html')

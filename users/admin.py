@@ -10,14 +10,14 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Invoice)
 class InvoiceAdmin(admin.ModelAdmin):
-    list_display = ['user', 'invoice_number', 'total_amount', 'loading_amount', 'debit_amount']
+    list_display = ['user', 'invoice_number', 'total_amount', 'loading_amount', 'debit_amount', 'created']
     search_fields = ['user__name', 'invoice_number']
 
 
 @admin.register(InvoiceItem)
 class InvoiceItemAdmin(admin.ModelAdmin):
     model = InvoiceItem
-    list_display = ['invoice', 'product', 'quantity', 'unit_price', 'price']
+    list_display = ['invoice', 'product', 'quantity', 'unit_price', 'price', 'created']
 
 
 @admin.register(Product)
