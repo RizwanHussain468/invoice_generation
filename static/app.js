@@ -48,18 +48,21 @@ const tBody = document.getElementById("table-body");
 
 document.getElementById('downloadPDF').addEventListener('click', function () {
     const element = document.getElementById('pdfContent');
+    // Get invoice_id and phone_number from hidden input fields
+    const invoiceId = document.getElementById('invoice_id').value;
+    const phoneNumber = document.getElementById('user_phone_number').value;
 
     // Options for PDF generation
     const options = {
         margin: 2,
-        filename: 'invoice_id.pdf',
+        filename: `${phoneNumber}_${invoiceId}.pdf`, // Dynamic filename
         image: { type: 'jpeg', quality: 1.0 },
         html2canvas: {scale:3, logging: true, useCORS: true }, // Adjusted options for html2canvas
         jsPDF: { quantity: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
-    html2pdf(element, options);
-
+    // Generate the PDF and save it with dynamic filename
+    html2pdf().set(options).from(element).save();
 });
 
 document.getElementById('add-row').addEventListener('click', function (e) {

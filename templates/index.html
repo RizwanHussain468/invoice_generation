@@ -21,6 +21,9 @@
 </head>
 
 <body style="background-color: white;">
+<!-- Hidden input fields to store the dynamic values for JavaScript -->
+<input type="hidden" id="invoice_id" value="{{ invoice_id }}">
+<input type="hidden" id="user_phone_number" value="{{ user.phone_number }}">
 <button id="downloadPDF" style="
   background-color: red;
   color: white;
