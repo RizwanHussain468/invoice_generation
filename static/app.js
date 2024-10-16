@@ -55,7 +55,7 @@ document.getElementById('downloadPDF').addEventListener('click', function () {
     // Options for PDF generation
     const options = {
         margin: 2,
-        filename: `${phoneNumber}_${invoiceId}.pdf`, // Dynamic filename
+        filename: `${phoneNumber} (${invoiceId}).pdf`, // Dynamic filename
         image: { type: 'jpeg', quality: 1.0 },
         html2canvas: {scale:3, logging: true, useCORS: true }, // Adjusted options for html2canvas
         jsPDF: { quantity: 'mm', format: 'a4', orientation: 'portrait' }
