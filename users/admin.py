@@ -22,6 +22,6 @@ class InvoiceItemAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'description']
+    list_display = ['id', 'name', 'stock', 'description', 'modified']
     search_fields = ['name']
 

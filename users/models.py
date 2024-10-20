@@ -23,6 +23,7 @@ class Invoice(TimeStampedModel):
 
 class Product(TimeStampedModel):
     name = models.CharField(max_length=255, null=True, blank=True)
+    stock = models.IntegerField(default=0)
     description = models.TextField(blank=True, null=True)
 
     def __str__(self):

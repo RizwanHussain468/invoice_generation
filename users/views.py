@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.http import HttpResponse
 from django.contrib import messages
 from django.shortcuts import render, get_object_or_404, redirect
+from django.db import transaction
 
 from .models import User, Invoice, InvoiceItem, Product
 from django.utils import timezone
@@ -73,6 +74,7 @@ def generate_invoice(request, invoice_id, user_id):
     return response
 
 
+@transaction.atomic
 def save_data(request):
     name = request.POST.get('name')
     phone = request.POST.get('phone')
@@ -96,6 +98,7 @@ def save_data(request):
     if not user_invoice:
         user_invoice = Invoice.objects.create(user=user)
 
+    products_to_update = []
     for unit_price, product_id, quantity, unit in zip(
         unit_price_list, product_list, quantity_list, unit_list
     ):
@@ -103,12 +106,21 @@ def save_data(request):
         product_id = int(product_id)
         quantity = int(quantity)
 
+        product = Product.objects.get(id=product_id)
+        if product.stock < quantity:
+            return HttpResponse(f"Insufficient stock for product {product.name}.")
+
         price = unit_price * quantity
         total_amount += price
+        products_to_update.append((product, quantity, price, unit_price, unit))
+
+    for product, quantity, price, unit_price, unit in products_to_update:
+        product.stock -= quantity
+        product.save()
 
         InvoiceItem.objects.create(
             invoice=user_invoice,
-            product_id=product_id,
+            product_id=product.id,
             quantity=quantity,
             price=price,
             unit_price=unit_price,
